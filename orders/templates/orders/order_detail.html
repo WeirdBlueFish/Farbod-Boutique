@@ -1,0 +1,89 @@
+{% extends 'store/base.html' %}
+{% load jalali %}
+{% block title %}جزئیات سفارش #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🧾 فاکتور سفارش <span class="text-muted">#{{ order.id }}</span></h2>
+        <small class="text-muted">تاریخ ثبت: {{ order.created|to_jalali_time }}</small>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">⬅️ بازگشت به پروفایل</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white fw-bold">اطلاعات ارسال</div>
+                <div class="card-body">
+                    <p><strong>تحویل گیرنده:</strong> {{ order.first_name }} {{ order.last_name }}</p>
+                    <p><strong>آدرس:</strong> {{ order.city }}، {{ order.address }}</p>
+                    <p><strong>کد پستی:</strong> {{ order.postal_code }}</p>
+                    <hr>
+                    <p>
+                        <strong>وضعیت پرداخت:</strong>
+                        {% if order.paid %}
+                            <span class="badge bg-success">پرداخت شده</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">در انتظار پرداخت</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white fw-bold">اقلام سفارش</div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>محصول</th>
+                                <th>مشخصات</th>
+                                <th>تعداد</th>
+                                <th>قیمت کل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product.image %}
+                                                <img src="{{ item.product.image.url }}" width="50" height="50" class="rounded me-2" style="object-fit: cover;">
+                                            {% endif %}
+                                            <a href="{{ item.product.get_absolute_url }}" class="text-decoration-none text-dark fw-bold">
+                                                {{ item.product.name }}
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if item.variant %}
+                                            <span class="badge bg-light text-dark border">
+                                                رنگ: {{ item.variant.color.name }}
+                                            </span>
+                                            <span class="badge bg-light text-dark border">
+                                                سایز: {{ item.variant.size.name }}
+                                            </span>
+                                        {% else %}
+                                            <small class="text-muted">بدون مشخصات</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.quantity }} عدد</td>
+                                    <td>{{ item.get_cost }} تومان</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">جمع کل سفارش:</td>
+                                <td class="fw-bold text-success">{{ order.get_total_cost }} تومان</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

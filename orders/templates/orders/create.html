@@ -1,0 +1,54 @@
+{% extends 'store/base.html' %}
+
+{% block title %}تسویه حساب{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 py-3">
+                <h4 class="mb-0">📝 اطلاعات ارسال سفارش</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <style>
+                        input, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 5px; }
+                        label { margin-bottom: 5px; font-weight: bold; color: #555; }
+                    </style>
+                    
+                    {{ form.as_p }}
+                    
+                    <button type="submit" class="btn btn-success btn-lg w-100 mt-3">
+                        ✅ ثبت نهایی و پرداخت
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 bg-light">
+            <div class="card-body">
+                <h5 class="card-title mb-4">خلاصه سفارش</h5>
+                <ul class="list-group list-group-flush bg-transparent">
+                    {% for item in cart %}
+                        <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                            {{ item.product.name }}
+                            <span class="badge bg-secondary rounded-pill">{{ item.quantity }} عدد</span>
+                        </li>
+                        <li class="list-group-item bg-transparent px-0 text-muted small">
+                             قیمت کل: {{ item.total_price }} تومان
+                        </li>
+                    {% endfor %}
+                    
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0 fw-bold mt-3 border-top">
+                        مبلغ قابل پرداخت:
+                        <span class="text-success">{{ cart.get_total_price }} تومان</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

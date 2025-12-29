@@ -1,0 +1,46 @@
+{% extends 'store/base.html' %}
+
+{% block title %}ورود به حساب کاربری{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <span style="font-size: 3rem;">🔐</span>
+                    <h3 class="mt-2">ورود به حساب</h3>
+                </div>
+
+                {% if form.errors %}
+                    <div class="alert alert-danger text-center small">
+                        نام کاربری یا رمز عبور اشتباه است.
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-warning w-100 py-2 fw-bold mt-3">ورود به سایت 🚀</button>
+                    
+                    {% if request.GET.next %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
+                    {% endif %}
+                </form>
+
+                <div class="text-center mt-4 border-top pt-3">
+                    <p class="small text-muted">حساب کاربری ندارید؟</p>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-dark btn-sm w-50">ثبت‌نام کنید</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

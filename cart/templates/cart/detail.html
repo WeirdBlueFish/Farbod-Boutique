@@ -1,0 +1,92 @@
+{% extends 'store/base.html' %}
+{% load humanize %} <td>{{ item.price|intcomma }} تومان</td>
+{% block title %}سبد خرید من{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">سبد خرید شما</h2>
+
+<div class="table-responsive shadow-sm rounded">
+    <table class="table table-hover align-middle bg-white mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>محصول</th>
+                <th>تعداد</th>
+                <th>قیمت واحد</th>
+                <th>قیمت کل</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" class="me-3">
+                            {% endif %}
+                            <div>
+                                <span class="fw-bold d-block">{{ item.product.name }}</span>
+                                {% if item.variant %}
+                                    <small class="text-muted">
+                                        رنگ: {{ item.variant.color }} | سایز: {{ item.variant.size }}
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.price|intcomma }} تومان</td>
+                    <td>{{ item.total_price|intcomma }} تومان</td>
+                    <td>
+                        <a href="{% url 'cart:cart_remove' item.item_id %}" class="btn btn-sm btn-outline-danger">
+                            حذف ❌
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 p-3">
+            <h6 class="fw-bold">🎟 کد تخفیف دارید؟</h6>
+            <form action="{% url 'coupons:apply' %}" method="post" class="d-flex gap-2 mt-2">
+                {% csrf_token %}
+                {{ coupon_apply_form.code }}
+                <button type="submit" class="btn btn-dark">اعمال</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card bg-light border-0 p-3">
+            <div class="d-flex justify-content-between mb-2">
+                <span>جمع کل:</span>
+                <span class="fw-bold">{{ cart.get_total_price|intcomma }} تومان</span>
+            </div>
+
+            {% if cart.coupon %}
+                <div class="d-flex justify-content-between mb-2 text-success">
+                    <span>تخفیف ({{ cart.coupon.code }} - {{ cart.coupon.discount }}%):</span>
+                    <span>{{ cart.get_discount|intcomma }}- تومان</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fs-5 fw-bold text-dark">
+                    <span>مبلغ قابل پرداخت:</span>
+                    <span>{{ cart.get_total_price_after_discount|intcomma }} تومان</span>
+                </div>
+            {% else %}
+                <hr>
+                <div class="d-flex justify-content-between fs-5 fw-bold">
+                    <span>مبلغ قابل پرداخت:</span>
+                    <span>{{ cart.get_total_price|intcomma }} تومان</span>
+                </div>
+            {% endif %}
+
+            <a href="#" class="btn btn-success w-100 mt-3 py-2">تسویه حساب نهایی</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

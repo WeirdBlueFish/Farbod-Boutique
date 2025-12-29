@@ -1,0 +1,74 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+{% load jalali %} {% block title %}پروفایل من{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 text-center p-4 mb-3">
+            <div style="font-size: 50px;">👤</div>
+            <h4 class="mt-2">{{ user.username }}</h4>
+            <p class="text-muted small">{{ user.email }}</p>
+            <hr>
+            <form action="{% url 'accounts:logout' %}" method="post">
+                {% csrf_token %} <button class="btn btn-outline-danger w-100 btn-sm">خروج از حساب</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        
+        <h3 class="mb-3">📦 سفارش‌های من</h3>
+        {% if orders %}
+            <div class="card shadow-sm border-0 mb-5">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 text-center align-middle">
+                        <thead class="table-light"><tr><th>شماره</th><th>تاریخ</th><th>مبلغ</th><th>وضعیت</th><th>فاکتور</th></tr></thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td class="fw-bold">#{{ order.id }}</td>
+                                    <td>{{ order.created|to_jalali }}</td>
+                                    <td>{{ order.get_total_cost|intcomma }}</td>
+                                    <td>
+                                        {% if order.paid %}<span class="badge bg-success">پرداخت شده</span>
+                                        {% else %}<span class="badge bg-warning text-dark">در انتظار</span>{% endif %}
+                                    </td>
+                                    <td><a href="{% url 'orders:order_detail' order.id %}" class="btn btn-sm btn-info text-white">مشاهده</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">شما هنوز خریدی انجام نداده‌اید.</div>
+        {% endif %}
+
+        <h3 class="mb-3 border-top pt-4">❤️ علاقه‌مندی‌های من</h3>
+        {% if user.favorites.all %}
+            <div class="row row-cols-1 row-cols-md-3 g-3">
+                {% for product in user.favorites.all %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-0">
+                            <a href="{{ product.get_absolute_url }}">
+                                {% if product.image %}<img src="{{ product.image.url }}" class="card-img-top" style="height: 180px; object-fit: cover;">{% endif %}
+                            </a>
+                            <div class="card-body text-center p-2">
+                                <h6 class="card-title text-truncate"><a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none">{{ product.name }}</a></h6>
+                                <div class="text-success small fw-bold">{{ product.price|intcomma }} تومان</div>
+                                <a href="{% url 'store:add_to_favorites' product.id %}" class="btn btn-sm btn-outline-danger mt-2 w-100">
+                                    <i class="bi bi-trash"></i> حذف
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-light border text-center">لیست علاقه‌مندی‌های شما خالی است. 💔</div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

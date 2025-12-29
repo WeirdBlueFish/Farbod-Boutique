@@ -1,0 +1,55 @@
+{% extends 'store/base.html' %}
+
+{% block title %}ثبت‌نام در فربد بوتیک{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4">📝 ثبت‌نام کاربر جدید</h3>
+                
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }} {% if field.help_text %}
+                                <small class="text-muted d-block mt-1" style="font-size: 0.85rem;">
+                                    <i class="bi bi-info-circle"></i> {{ field.help_text }}
+                                </small>
+                            {% endif %}
+                            
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-warning w-100 py-2 fw-bold">ثبت‌نام در سایت ✨</button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p>قبلاً ثبت‌نام کرده‌اید؟ <a href="{% url 'accounts:login' %}">وارد شوید</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

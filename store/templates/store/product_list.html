@@ -1,0 +1,124 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}فروشگاه فربد بوتیک{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 p-3 sticky-top" style="top: 90px; z-index: 1;">
+            <h5 class="fw-bold mb-3">🔍 جستجو و فیلتر</h5>
+            
+            <form method="get">
+                <div class="input-group mb-3">
+                    <input type="text" name="q" class="form-control" placeholder="نام محصول..." value="{{ request.GET.q|default:'' }}">
+                    <button class="btn btn-dark" type="submit">🔎</button>
+                </div>
+
+                <hr>
+
+                <h6 class="fw-bold">📂 دسته‌بندی‌ها</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="{% url 'store:product_list' %}" class="text-decoration-none {% if not category %}fw-bold text-dark{% else %}text-muted{% endif %}">
+                            همه محصولات
+                        </a>
+                    </li>
+                    {% for c in categories %}
+                        <li class="mb-2">
+                            <a href="{{ c.get_absolute_url }}" class="text-decoration-none {% if category.slug == c.slug %}fw-bold text-dark{% else %}text-muted{% endif %}">
+                                {{ c.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <hr>
+
+                <h6 class="fw-bold">💰 محدوده قیمت</h6>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <input type="number" name="min_price" class="form-control form-control-sm" placeholder="از..." value="{{ request.GET.min_price }}">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" name="max_price" class="form-control form-control-sm" placeholder="تا..." value="{{ request.GET.max_price }}">
+                    </div>
+                </div>
+
+                <h6 class="fw-bold">Sort مرتب‌سازی</h6>
+                <select name="sort" class="form-select form-select-sm mb-3">
+                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>جدیدترین</option>
+                    <option value="cheapest" {% if request.GET.sort == 'cheapest' %}selected{% endif %}>ارزان‌ترین</option>
+                    <option value="expensive" {% if request.GET.sort == 'expensive' %}selected{% endif %}>گران‌ترین</option>
+                </select>
+
+                <button type="submit" class="btn btn-success w-100">اعمال فیلتر ✅</button>
+                
+                {% if request.GET %}
+                    <a href="{% url 'store:product_list' %}" class="btn btn-outline-danger w-100 mt-2">حذف فیلترها ❌</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+            <h4 class="mb-0">
+                {% if category %}
+                    دسته‌بندی: <span class="text-success">{{ category.name }}</span>
+                {% else %}
+                    همه محصولات
+                {% endif %}
+            </h4>
+            <span class="text-muted small">{{ products.count }} محصول پیدا شد</span>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for product in products %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 product-card">
+                        
+                        <div class="position-relative overflow-hidden">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 300px; object-fit: cover;">
+                            {% else %}
+                                <img src="https://via.placeholder.com/300x300" class="card-img-top">
+                            {% endif %}
+                            
+                            <span class="position-absolute top-0 end-0 bg-danger text-white px-2 py-1 m-2 rounded small">جدید</span>
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark stretched-link">
+                                    {{ product.name }}
+                                </a>
+                            </h5>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="text-success fw-bold">{{ product.price|intcomma }} تومان</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer bg-white border-0 pb-3">
+                            <a href="{{ product.get_absolute_url }}" class="btn btn-outline-dark w-100">مشاهده و خرید</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center mt-5">
+                    <h3 class="text-muted">محصولی با این مشخصات پیدا نشد! 😔</h3>
+                    <a href="{% url 'store:product_list' %}" class="btn btn-link">مشاهده همه محصولات</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card { transition: transform 0.2s; }
+    .product-card:hover { transform: translateY(-5px); }
+</style>
+
+{% endblock %}
